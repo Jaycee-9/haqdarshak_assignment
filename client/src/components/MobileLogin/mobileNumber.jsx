@@ -2,12 +2,14 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import MobileNumberConfirmationDialog from "./mobileNumberConfirmation";
 import OTP from "./OTP";
+import { generateOTP } from "../../service/api";
 
 function MobileNumber({ setScreen }) {
   const [phoneNum, setPhoneNum] = useState(null);
   const [validation, checkValidation] = useState([]);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("MobileNumber");
+  const [newOTP, setNewOTP] = useState(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -24,6 +26,14 @@ function MobileNumber({ setScreen }) {
   const storeMobileNumber = (evt) => {
     setPhoneNum({ ...phoneNum, [evt.target.name]: evt.target.value });
     checkValidation(evt.target.value);
+  };
+
+  const getOTP = async () => {
+    const res = await generateOTP({ mobile_number: phoneNum?.mobile_number });
+    setNewOTP(res.data.mobileOTP);
+    setTimeout(() => {
+      alert(`${res.data.mobileOTP} is your OTP to login`);
+    }, 1500);
   };
 
   return (
@@ -45,7 +55,7 @@ function MobileNumber({ setScreen }) {
                 id="standard-multiline-flexible"
                 label="Enter mobile number"
                 type="number"
-                name="mobileNumber"
+                name="mobile_number"
                 className="w-full text-[#50464B] absolute bottom-[8px] text-[16px]"
                 variant="standard"
                 InputProps={{
@@ -76,10 +86,13 @@ function MobileNumber({ setScreen }) {
             handleClose={handleClose}
             phoneNum={phoneNum}
             setView={setView}
+            getOTP={getOTP}
           />
         </div>
       )}
-      {view === "otp" && <OTP />}
+      {view === "otp" && (
+        <OTP setView={setView} newOTP={newOTP} phoneNum={phoneNum} />
+      )}
     </>
   );
 }
