@@ -81,7 +81,9 @@ function Login({ setPage }) {
           </div>
         </div>
       )}
-      {screen === "mobileLogin" && <MobileNumber setScreen={setScreen} />}
+      {screen === "mobileLogin" && (
+        <MobileNumber setScreen={setScreen} screen={screen} />
+      )}
     </>
   );
 }

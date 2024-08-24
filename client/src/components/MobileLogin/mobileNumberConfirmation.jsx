@@ -3,7 +3,23 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 
-function MobileNumberConfirmationDialog({ open, handleClose, phoneNum }) {
+import { generateOTP } from "../../service/api";
+
+function MobileNumberConfirmationDialog({
+  open,
+  handleClose,
+  phoneNum,
+  setView,
+}) {
+  const getOTP = async () => {
+    const res = await generateOTP({ mobile_number: phoneNum?.mobileNumber });
+    console.log(res.data.mobileOTP);
+  };
+
+  const changeScreen = () => {
+    setView("otp");
+  };
+
   return (
     <>
       <Dialog
@@ -21,7 +37,14 @@ function MobileNumberConfirmationDialog({ open, handleClose, phoneNum }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Edit</Button>
-          <Button onClick={handleClose}>Send OTP</Button>
+          <Button
+            onClick={() => {
+              getOTP();
+              changeScreen();
+            }}
+          >
+            Send OTP
+          </Button>
         </DialogActions>
       </Dialog>
     </>
