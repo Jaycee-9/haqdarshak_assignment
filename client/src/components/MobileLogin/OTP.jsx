@@ -1,9 +1,24 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { loginUser } from "../../service/api";
+import { generateOTP } from "../../service/api";
 
-function OTP({ setView, newOTP, phoneNum }) {
+function OTP({ setView, newOTP, phoneNum, setNewOTP }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
+  const [timeLeft, setTimeLeft] = useState(179);
   const inputsRef = useRef([]);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
+
+  const formatTime = () => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
 
   const goBack = () => {
     setView("MobileNumber");
@@ -41,6 +56,14 @@ function OTP({ setView, newOTP, phoneNum }) {
     }
   };
 
+  const getOTP = async () => {
+    const res = await generateOTP({ mobile_number: phoneNum?.mobile_number });
+    setNewOTP(res.data.mobileOTP);
+    setTimeout(() => {
+      alert(`${res.data.mobileOTP} is your OTP to login`);
+    }, 1500);
+  };
+
   return (
     <div className="max-w-[360px] relative h-[810px] mt-10 w-full mx-auto bg-[#4F285E] rounded-[32px]">
       <img
@@ -69,9 +92,25 @@ function OTP({ setView, newOTP, phoneNum }) {
               />
             ))}
         </div>
-        <h1 className="text-[14px] text-[#746E6A] mt-[25px]">
-          We have sent an OTP to your mobile number.
-        </h1>
+
+        {timeLeft > 0 ? (
+          <>
+            <h1 className="text-[12px] text-[#746E6A] mt-[25px]">
+              We have sent an OTP to your mobile number.
+            </h1>
+            <h1 className="text-[#4F285E] text-[16px]">
+              Resend code in {formatTime()}
+            </h1>
+          </>
+        ) : (
+          <div className="flex  items-center p-3">
+            <h1>Did not receive OTP?</h1>
+
+            <button className="underline text-[#4F285E] ml-3 " onClick={getOTP}>
+              Resend
+            </button>
+          </div>
+        )}
 
         {otp.every((digit) => digit !== "") ? (
           <button

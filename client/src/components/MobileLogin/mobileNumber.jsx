@@ -91,7 +91,12 @@ function MobileNumber({ setScreen }) {
         </div>
       )}
       {view === "otp" && (
-        <OTP setView={setView} newOTP={newOTP} phoneNum={phoneNum} />
+        <OTP
+          setView={setView}
+          newOTP={newOTP}
+          setNewOTP={setNewOTP}
+          phoneNum={phoneNum}
+        />
       )}
     </>
   );
